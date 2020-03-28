@@ -7,7 +7,7 @@ export interface State extends fromRoot.State {
 
 export interface ProductState {
     showProductCode: boolean;
-    currentProduct: Product;
+    currentProduct: Product | null;
     products: Product[];
 }
 
