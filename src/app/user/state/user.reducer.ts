@@ -1,4 +1,12 @@
-export function reducer(state, action) {
+export interface UserState {
+    maskUserName: boolean;
+}
+
+const initialState: UserState = {
+    maskUserName: false
+};
+
+export function reducer(state = initialState, action) {
     switch (action.type) {
 
         case 'MASK_USER_NAME':
