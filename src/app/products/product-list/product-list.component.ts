@@ -38,12 +38,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
     });
 
     // TODO: Unsubscribe
-    this.store.pipe(select('products')).subscribe({
-      next: products => {
-        if (products) {
-          this.displayCode = products.showProductCode;
-        }
-      }
+    this.store.pipe(select(fromProduct.getShowProductCode)).subscribe({
+      next: showProductCode => this.displayCode = showProductCode
     });
   }
 
