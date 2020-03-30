@@ -1,106 +1,100 @@
 import { Product } from '../product';
-import { ProductActions, ProductActionTypes } from './product.actions';
+import * as ProductActions from './product.actions';
+import { createReducer, on, Action } from '@ngrx/store';
 
 // State for this feature (Product)
-
+export const productFeatureKey = 'products';
 
 export interface ProductState {
-    showProductCode: boolean;
-    currentProductId: number | null;
-    products: Product[];
-    error: string;
+  showProductCode: boolean;
+  currentProductId: number | null;
+  products: Product[];
+  error: string;
 }
 
 const initialState: ProductState = {
-    showProductCode: true,
-    currentProductId: null,
-    products: [],
-    error: ''
+  showProductCode: true,
+  currentProductId: null,
+  products: [],
+  error: ''
 };
 
-export function reducer(state = initialState, action: ProductActions): ProductState {
-    switch (action.type) {
+const productReducer = createReducer(
+  initialState,
 
-        case ProductActionTypes.ToggleProductCode:
-            return {
-                ...state,
-                showProductCode: action.payload
-            };
+  on(ProductActions.toggleProductCode, (state, { value }) => ({
+    ...state,
+    showProductCode: value
+  })),
 
-        case ProductActionTypes.SetCurrentProduct:
-            return {
-                ...state,
-                currentProductId: action.payload.id
-            };
+  on(ProductActions.setCurrentProduct, (state, { product }) => ({
+    ...state,
+    currentProductId: product.id
+  })),
 
-        case ProductActionTypes.ClearCurrentProduct:
-            return {
-                ...state,
-                currentProductId: null
-            };
+  on(ProductActions.clearCurrentProduct, state => ({
+    ...state,
+    currentProductId: null
+  })),
 
-        case ProductActionTypes.InitializeCurrentProduct:
-            return {
-                ...state,
-                currentProductId: 0
-            };
+  on(ProductActions.initializeCurrentProduct, state => ({
+    ...state,
+    currentProductId: 0
+  })),
 
-        case ProductActionTypes.LoadSuccess:
-            return {
-                ...state,
-                products: action.payload,
-                error: ''
-            };
+  on(ProductActions.loadSuccess, (state, { products }) => ({
+    ...state,
+    products,
+    error: ''
+  })),
 
-        case ProductActionTypes.LoadFail:
-            return {
-                ...state,
-                products: [],
-                error: action.payload
-            };
+  on(ProductActions.loadFail, (state, { error }) => ({
+    ...state,
+    products: [],
+    error
+  })),
 
-        case ProductActionTypes.UpdateProductSuccess:
-            const updatedProducts = state.products.map(
-               item => action.payload.id === item.id ? action.payload : item
-            );
-            return {
-                ...state,
-                products: updatedProducts,
-                currentProductId: action.payload.id,
-                error: ''
-            };
+  on(ProductActions.updateProductSuccess, (state, { product }) => {
+    const updatedProducts = state.products.map(item =>
+      product.id === item.id ? product : item
+    );
+    return {
+      ...state,
+      products: updatedProducts,
+      currentProductId: product.id,
+      error: ''
+    };
+  }),
 
-        case ProductActionTypes.UpdateProductFail:
-            return {
-                ...state,
-                error: action.payload
-            };
+  on(ProductActions.updateProductFail, (state, { error }) => ({
+    ...state,
+    error
+  })),
 
-        case ProductActionTypes.CreateProductSuccess:
-            const productsWithCreated = state.products.concat(action.payload);
-            return {
-                ...state,
-                products: productsWithCreated,
-                currentProductId: action.payload.id,
-                error: ''
-            };
+  on(ProductActions.createProductSuccess, (state, { product }) => ({
+    ...state,
+    products: state.products.concat(product),
+    currentProductId: product.id,
+    error: ''
+  })),
 
-        case ProductActionTypes.DeleteProductFail:
-        case ProductActionTypes.CreateProductFail:
-            return {
-                ...state,
-                error: action.payload
-            };
+  on(ProductActions.createProductFail, (state, { error }) => ({
+    ...state,
+    error
+  })),
 
-        case ProductActionTypes.DeleteProductSuccess:
-            const productsWithoutDeleted = state.products.filter(p => p.id !== action.payload);
-            return {
-                ...state,
-                products: productsWithoutDeleted,
-                error: ''
-            };
+  on(ProductActions.deleteProductSuccess, (state, { id }) => ({
+    ...state,
+    products: state.products.filter(p => p.id !== id),
+    error: ''
+  })),
 
-        default:
-            return state;
-    }
+  on(ProductActions.deleteProductFail, (state, { error }) => ({
+    ...state,
+    error
+  }))
+);
+
+export function reducer(state: ProductState | undefined, action: Action) {
+  return productReducer(state, action);
 }

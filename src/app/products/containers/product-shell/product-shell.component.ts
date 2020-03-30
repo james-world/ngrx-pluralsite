@@ -8,20 +8,19 @@ import * as fromProduct from '../../state';
 import * as productActions from '../../state/product.actions';
 
 @Component({
-    templateUrl: './product-shell.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+  templateUrl: './product-shell.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductShellComponent implements OnInit {
-
   errorMessage$: Observable<string>;
   displayCode$: Observable<boolean>;
   products$: Observable<Product[]>;
   selectedProduct$: Observable<Product | null>;
 
-  constructor(private store: Store<fromProduct.State>) { }
+  constructor(private store: Store<fromProduct.State>) {}
 
   ngOnInit(): void {
-    this.store.dispatch(new productActions.Load());
+    this.store.dispatch(productActions.load());
 
     this.errorMessage$ = this.store.select(fromProduct.getError);
     this.products$ = this.store.select(fromProduct.getProducts);
@@ -30,30 +29,30 @@ export class ProductShellComponent implements OnInit {
   }
 
   checkChanged(value: boolean): void {
-    this.store.dispatch(new productActions.ToggleProductCode(value));
+    this.store.dispatch(productActions.toggleProductCode({ value }));
   }
 
   newProduct(): void {
-    this.store.dispatch(new productActions.InitializeCurrentProduct());
+    this.store.dispatch(productActions.initializeCurrentProduct());
   }
 
   productSelected(product: Product): void {
-    this.store.dispatch(new productActions.SetCurrentProduct(product));
+    this.store.dispatch(productActions.setCurrentProduct({ product }));
   }
 
-  deleteProduct(productId: number): void {
-    this.store.dispatch(new productActions.DeleteProduct(productId));
+  deleteProduct(id: number): void {
+    this.store.dispatch(productActions.deleteProduct({ id }));
   }
 
   clearProduct(): void {
-    this.store.dispatch(new productActions.ClearCurrentProduct());
+    this.store.dispatch(productActions.clearCurrentProduct());
   }
 
   createProduct(product: Product): void {
-    this.store.dispatch(new productActions.CreateProduct(product));
+    this.store.dispatch(productActions.createProduct({ product }));
   }
 
   updateProduct(product: Product): void {
-    this.store.dispatch(new productActions.UpdateProduct(product));
+    this.store.dispatch(productActions.updateProduct({ product }));
   }
 }
