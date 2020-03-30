@@ -123,18 +123,27 @@ export function reducer(state = initialState, action: ProductActions): ProductSt
             };
 
         case ProductActionTypes.CreateProductSuccess:
-            const products = state.products.concat(action.payload);
+            const productsWithCreated = state.products.concat(action.payload);
             return {
                 ...state,
-                products,
+                products: productsWithCreated,
                 currentProductId: action.payload.id,
                 error: ''
             };
 
+        case ProductActionTypes.DeleteProductFail:
         case ProductActionTypes.CreateProductFail:
             return {
                 ...state,
                 error: action.payload
+            };
+
+        case ProductActionTypes.DeleteProductSuccess:
+            const productsWithoutDeleted = state.products.filter(p => p.id !== action.payload);
+            return {
+                ...state,
+                products: productsWithoutDeleted,
+                error: ''
             };
 
         default:
