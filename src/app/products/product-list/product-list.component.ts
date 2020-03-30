@@ -1,10 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-import { Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { Product } from '../product';
 import { ProductService } from '../product.service';
-import { Store, select } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import * as fromProduct from '../state/product.reducer';
 import * as productActions from '../state/product.actions';
 
@@ -13,38 +13,29 @@ import * as productActions from '../state/product.actions';
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
 })
-export class ProductListComponent implements OnInit, OnDestroy {
+export class ProductListComponent implements OnInit {
   pageTitle = 'Products';
   errorMessage: string;
 
-  displayCode: boolean;
-
-  products: Product[];
+  products$: Observable<Product[]>;
+  displayCode$: Observable<boolean>;
+  errorMessage$: Observable<string>;
 
   // Used to highlight the selected product in the list
-  selectedProduct: Product | null;
+  selectedProduct$: Observable<Product | null>;
+
 
   constructor(private store: Store<fromProduct.State>,
               private productService: ProductService) { }
 
   ngOnInit(): void {
-    // TODO: Unsubscribe
-    this.store.pipe(select(fromProduct.getCurrentProduct)).subscribe({
-      next: currentProduct => this.selectedProduct = currentProduct
-    });
 
-    this.productService.getProducts().subscribe({
-      next: (products: Product[]) => this.products = products,
-      error: (err: any) => this.errorMessage = err.error
-    });
+    this.store.dispatch(new productActions.Load());
 
-    // TODO: Unsubscribe
-    this.store.pipe(select(fromProduct.getShowProductCode)).subscribe({
-      next: showProductCode => this.displayCode = showProductCode
-    });
-  }
-
-  ngOnDestroy(): void {
+    this.errorMessage$ = this.store.select(fromProduct.getError);
+    this.products$ = this.store.select(fromProduct.getProducts);
+    this.selectedProduct$ = this.store.select(fromProduct.getCurrentProduct);
+    this.displayCode$ = this.store.select(fromProduct.getShowProductCode);
   }
 
   checkChanged(value: boolean): void {

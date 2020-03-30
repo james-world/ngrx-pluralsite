@@ -6,9 +6,11 @@ import { ProductService } from '../product.service';
 import { GenericValidator } from '../../shared/generic-validator';
 import { NumberValidators } from '../../shared/number.validator';
 
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import * as fromProduct from '../state/product.reducer';
 import * as productActions from '../state/product.actions';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'pm-product-edit',
@@ -26,6 +28,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
   displayMessage: { [key: string]: string } = {};
   private validationMessages: { [key: string]: { [key: string]: string } };
   private genericValidator: GenericValidator;
+  private componentDestroyed$ = new Subject<void>();
 
   constructor(private fb: FormBuilder,
               private productService: ProductService,
@@ -64,19 +67,19 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     });
 
     // Watch for changes to the currently selected product
-    // TODO: Unsubscribe
-    this.store.select(fromProduct.getCurrentProduct).subscribe({
+    this.store.pipe(select(fromProduct.getCurrentProduct), takeUntil(this.componentDestroyed$)).subscribe({
       next: currentProduct => this.displayProduct(currentProduct)
     });
 
     // Watch for value changes
-    this.productForm.valueChanges.subscribe(
-      value => this.displayMessage = this.genericValidator.processMessages(this.productForm)
-    );
+    this.productForm.valueChanges.pipe(takeUntil(this.componentDestroyed$))
+    .subscribe({
+      next: value => this.displayMessage = this.genericValidator.processMessages(this.productForm),
+    });
   }
 
   ngOnDestroy(): void {
-
+    this.componentDestroyed$.next();
   }
 
   // Also validate on blur
