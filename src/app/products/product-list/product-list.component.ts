@@ -19,6 +19,7 @@ export class ProductListComponent implements OnInit {
 
   products$: Observable<Product[]>;
   displayCode$: Observable<boolean>;
+  errorMessage$: Observable<string>;
 
   // Used to highlight the selected product in the list
   selectedProduct$: Observable<Product | null>;
@@ -31,6 +32,7 @@ export class ProductListComponent implements OnInit {
 
     this.store.dispatch(new productActions.Load());
 
+    this.errorMessage$ = this.store.select(fromProduct.getError);
     this.products$ = this.store.select(fromProduct.getProducts);
     this.selectedProduct$ = this.store.select(fromProduct.getCurrentProduct);
     this.displayCode$ = this.store.select(fromProduct.getShowProductCode);
