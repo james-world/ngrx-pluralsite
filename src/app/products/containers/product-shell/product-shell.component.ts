@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { Product } from '../../product';
 import { Store } from '@ngrx/store';
-import * as fromProduct from '../../state/product.reducer';
+import * as fromProduct from '../../state';
 import * as productActions from '../../state/product.actions';
 
 @Component({
@@ -39,5 +39,21 @@ export class ProductShellComponent implements OnInit {
 
   productSelected(product: Product): void {
     this.store.dispatch(new productActions.SetCurrentProduct(product));
+  }
+
+  deleteProduct(productId: number): void {
+    this.store.dispatch(new productActions.DeleteProduct(productId));
+  }
+
+  clearProduct(): void {
+    this.store.dispatch(new productActions.ClearCurrentProduct());
+  }
+
+  createProduct(product: Product): void {
+    this.store.dispatch(new productActions.CreateProduct(product));
+  }
+
+  updateProduct(product: Product): void {
+    this.store.dispatch(new productActions.UpdateProduct(product));
   }
 }
