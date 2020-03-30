@@ -37,4 +37,16 @@ export class ProductEffects {
         )
       )
   );
+
+  @Effect()
+  createProduct$ = this.actions$.pipe(
+      ofType(productActions.ProductActionTypes.CreateProduct),
+      map((action: productActions.CreateProduct) => action.payload),
+      mergeMap((product: Product) =>
+        this.productService.createProduct(product).pipe(
+            map(createdProduct => (new productActions.CreateProductSuccess(createdProduct))),
+            catchError(err => of(new productActions.CreateProductFail(err)))
+        )
+      )
+  );
 }
