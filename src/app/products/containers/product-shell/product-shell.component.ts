@@ -2,34 +2,24 @@ import { Component, OnInit } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
-import { Product } from '../product';
-import { ProductService } from '../product.service';
+import { Product } from '../../product';
 import { Store } from '@ngrx/store';
-import * as fromProduct from '../state/product.reducer';
-import * as productActions from '../state/product.actions';
+import * as fromProduct from '../../state/product.reducer';
+import * as productActions from '../../state/product.actions';
 
 @Component({
-  selector: 'pm-product-list',
-  templateUrl: './product-list.component.html',
-  styleUrls: ['./product-list.component.css']
+    templateUrl: './product-shell.component.html'
 })
-export class ProductListComponent implements OnInit {
-  pageTitle = 'Products';
-  errorMessage: string;
+export class ProductShellComponent implements OnInit {
 
-  products$: Observable<Product[]>;
-  displayCode$: Observable<boolean>;
   errorMessage$: Observable<string>;
-
-  // Used to highlight the selected product in the list
+  displayCode$: Observable<boolean>;
+  products$: Observable<Product[]>;
   selectedProduct$: Observable<Product | null>;
 
-
-  constructor(private store: Store<fromProduct.State>,
-              private productService: ProductService) { }
+  constructor(private store: Store<fromProduct.State>) { }
 
   ngOnInit(): void {
-
     this.store.dispatch(new productActions.Load());
 
     this.errorMessage$ = this.store.select(fromProduct.getError);
@@ -49,5 +39,4 @@ export class ProductListComponent implements OnInit {
   productSelected(product: Product): void {
     this.store.dispatch(new productActions.SetCurrentProduct(product));
   }
-
 }
